@@ -1,0 +1,29 @@
+# TestAuto项目依赖库
+# 使用方法: pip install -r requirements.txt
+
+# 基础库
+argparse
+datetime
+json
+re
+subprocess
+time
+os
+glob
+csv
+pathlib
+threading
+queue
+sys
+collections
+difflib
+
+# 第三方库
+appium==2.0.0  # 用于自动化测试
+selenium>=4.0.0  # 用于Web元素操作
+pytesseract>=0.3.8  # 用于OCR文字识别
+Pillow>=9.0.0  # 用于图像处理
+opencv-python>=4.5.0  # 用于图像处理和分析
+numpy>=1.20.0  # 用于数值计算
+flask>=2.0.0  # 用于Web应用开发
+ollama>=0.1.0  # 用于LLM模型调用
