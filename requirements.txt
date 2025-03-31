@@ -2,24 +2,12 @@
 # 使用方法: pip install -r requirements.txt
 
 # 基础库
-argparse
-datetime
-json
-re
-subprocess
-time
-os
-glob
-csv
-pathlib
-threading
-queue
-sys
-collections
-difflib
+# 注意：以下标准库模块已被移除，因为它们属于Python内置模块
+# argparse, datetime, json, re, subprocess, time, os, glob, csv
+# pathlib, threading, queue, sys, collections, difflib
 
 # 第三方库
-appium==2.0.0  # 用于自动化测试
+appium-python-client>=2.0.0  # 用于自动化测试
 selenium>=4.0.0  # 用于Web元素操作
 pytesseract>=0.3.8  # 用于OCR文字识别
 Pillow>=9.0.0  # 用于图像处理
