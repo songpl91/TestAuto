@@ -5,6 +5,8 @@ import time
 import re
 import json
 import datetime
+import platform
+import sys
 
 def get_latest_apk(directory):
     """获取指定目录下最新的APK文件"""
@@ -217,11 +219,60 @@ def save_apk_info_to_json(apk_info, device_info=None, result_dir=None):
     except Exception as e:
         print(f"保存APK信息到JSON文件失败: {e}")
 
+def get_system_type():
+    """获取当前操作系统类型"""
+    system = platform.system().lower()
+    if 'windows' in system:
+        return 'windows'
+    elif 'darwin' in system:
+        return 'mac'
+    elif 'linux' in system:
+        return 'linux'
+    else:
+        return 'unknown'
+
 def get_package_name(apk_path):
     """从APK文件中提取package name和其他信息，并获取APK文件大小"""
     try:
-        result = subprocess.run(['aapt', 'dump', 'badging', apk_path], 
-                              capture_output=True, text=True)
+        system_type = get_system_type()
+        
+        if system_type == 'mac':
+            # 在Mac上，aapt可能在Android SDK的build-tools目录下
+            # 尝试使用环境变量中的aapt或指定路径的aapt
+            try:
+                result = subprocess.run(['aapt', 'dump', 'badging', apk_path], 
+                                      capture_output=True, text=True)
+            except FileNotFoundError:
+                # 如果直接调用失败，尝试查找Android SDK路径
+                android_home = os.environ.get('ANDROID_HOME') or os.environ.get('ANDROID_SDK_ROOT')
+                if android_home:
+                    # 查找最新的build-tools版本
+                    build_tools_dir = os.path.join(android_home, 'build-tools')
+                    if os.path.exists(build_tools_dir):
+                        versions = os.listdir(build_tools_dir)
+                        if versions:
+                            latest_version = sorted(versions)[-1]
+                            aapt_path = os.path.join(build_tools_dir, latest_version, 'aapt')
+                            if os.path.exists(aapt_path):
+                                result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], 
+                                                      capture_output=True, text=True)
+                            else:
+                                print(f"错误：在 {aapt_path} 未找到aapt工具")
+                                return None
+                        else:
+                            print(f"错误：在 {build_tools_dir} 未找到build-tools版本")
+                            return None
+                    else:
+                        print(f"错误：未找到build-tools目录 {build_tools_dir}")
+                        return None
+                else:
+                    print("错误：未设置ANDROID_HOME或ANDROID_SDK_ROOT环境变量")
+                    return None
+        else:
+            # 其他系统直接尝试使用aapt
+            result = subprocess.run(['aapt', 'dump', 'badging', apk_path], 
+                                  capture_output=True, text=True)
+        
         if result.returncode != 0:
             print(f"错误：获取APK信息失败：{result.stderr}")
             return None
@@ -325,8 +376,17 @@ def main():
     import argparse
     import get_device_info
     
+    # 根据操作系统类型设置默认APK目录
+    system_type = get_system_type()
+    if system_type == 'windows':
+        default_apk_dir = "D:\\UnityProjects\\HexaMatch"
+    elif system_type == 'mac':
+        default_apk_dir = os.path.expanduser("/Volumes/MacEx/TestAutoAPK")
+    else:  # Linux或其他系统
+        default_apk_dir = os.path.expanduser("~/UnityProjects/HexaMatch")
+    
     parser = argparse.ArgumentParser(description='APK自动安装工具')
-    parser.add_argument('--apk-dir', default="D:\\UnityProjects\\HexaMatch", help='APK文件目录，默认为D:\\UnityProjects\\HexaMatch')
+    parser.add_argument('--apk-dir', default=default_apk_dir, help=f'APK文件目录，默认为{default_apk_dir}')
     parser.add_argument('--analyze', '-a', action='store_true', help='安装后是否进行性能分析')
     parser.add_argument('--duration', '-d', type=int, default=60, help='性能测试持续时间（秒），默认60秒')
     parser.add_argument('--interval', '-i', type=int, default=5, help='数据收集间隔（秒），默认5秒')

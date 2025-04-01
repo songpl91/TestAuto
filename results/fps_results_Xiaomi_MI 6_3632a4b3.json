@@ -1,0 +1,306 @@
+{
+  "device_info": {
+    "device_id": "3632a4b3",
+    "timestamp": "2025-04-01 08:27:10",
+    "model": {
+      "manufacturer": "Xiaomi",
+      "model": "MI 6",
+      "brand": "Xiaomi",
+      "full_name": "Xiaomi_MI 6",
+      "refresh_rate": 60.0
+    }
+  },
+  "test_info": {
+    "package_name": "com.kiwifun.game.android.hexacrush.puzzles",
+    "activity_name": "com.unity3d.player.UnityPlayerActivity",
+    "apk_file": "HexaCrush_v1.0.1_20250122_1733.apk",
+    "test_time": "2025-04-01 08:28:40",
+    "duration": 60
+  },
+  "fps_results": [
+    {
+      "iteration": 1,
+      "timestamp": "2025-04-01 08:27:41",
+      "fps": 43.0,
+      "total_frames": 43,
+      "janky_frames": 2,
+      "janky_percent": 6.934757992510998,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 2,
+      "timestamp": "2025-04-01 08:27:44",
+      "fps": 43.0,
+      "total_frames": 86,
+      "janky_frames": 4,
+      "janky_percent": 5.452420975007911,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 3,
+      "timestamp": "2025-04-01 08:27:46",
+      "fps": 48.0,
+      "total_frames": 134,
+      "janky_frames": 6,
+      "janky_percent": 6.223556401532434,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 4,
+      "timestamp": "2025-04-01 08:27:48",
+      "fps": 47.0,
+      "total_frames": 181,
+      "janky_frames": 8,
+      "janky_percent": 6.1203599670224405,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 5,
+      "timestamp": "2025-04-01 08:27:50",
+      "fps": 49.0,
+      "total_frames": 230,
+      "janky_frames": 11,
+      "janky_percent": 7.678266350040273,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 6,
+      "timestamp": "2025-04-01 08:27:52",
+      "fps": 44.0,
+      "total_frames": 274,
+      "janky_frames": 13,
+      "janky_percent": 5.627628528531567,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 7,
+      "timestamp": "2025-04-01 08:27:55",
+      "fps": 50.0,
+      "total_frames": 324,
+      "janky_frames": 15,
+      "janky_percent": 5.01591748459189,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 8,
+      "timestamp": "2025-04-01 08:27:57",
+      "fps": 56.0,
+      "total_frames": 380,
+      "janky_frames": 16,
+      "janky_percent": 2.0593690387952712,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 9,
+      "timestamp": "2025-04-01 08:27:59",
+      "fps": 49.0,
+      "total_frames": 429,
+      "janky_frames": 19,
+      "janky_percent": 7.317945062791442,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 10,
+      "timestamp": "2025-04-01 08:28:01",
+      "fps": 55.0,
+      "total_frames": 484,
+      "janky_frames": 20,
+      "janky_percent": 2.9274751439639592,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 11,
+      "timestamp": "2025-04-01 08:28:04",
+      "fps": 48.0,
+      "total_frames": 532,
+      "janky_frames": 23,
+      "janky_percent": 6.6603210742329635,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 12,
+      "timestamp": "2025-04-01 08:28:06",
+      "fps": 56.0,
+      "total_frames": 588,
+      "janky_frames": 24,
+      "janky_percent": 2.1912341142878033,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 13,
+      "timestamp": "2025-04-01 08:28:08",
+      "fps": 45.0,
+      "total_frames": 633,
+      "janky_frames": 26,
+      "janky_percent": 5.33784721430349,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 14,
+      "timestamp": "2025-04-01 08:28:11",
+      "fps": 48.0,
+      "total_frames": 681,
+      "janky_frames": 28,
+      "janky_percent": 5.1150112844821,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 15,
+      "timestamp": "2025-04-01 08:28:13",
+      "fps": 54.0,
+      "total_frames": 735,
+      "janky_frames": 29,
+      "janky_percent": 2.4176444674071944,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 16,
+      "timestamp": "2025-04-01 08:28:15",
+      "fps": 58.0,
+      "total_frames": 793,
+      "janky_frames": 30,
+      "janky_percent": 2.2859101457292827,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 17,
+      "timestamp": "2025-04-01 08:28:17",
+      "fps": 46.0,
+      "total_frames": 839,
+      "janky_frames": 33,
+      "janky_percent": 7.6389589590886775,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 18,
+      "timestamp": "2025-04-01 08:28:19",
+      "fps": 56.0,
+      "total_frames": 895,
+      "janky_frames": 34,
+      "janky_percent": 2.647275890653087,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 19,
+      "timestamp": "2025-04-01 08:28:22",
+      "fps": 54.0,
+      "total_frames": 949,
+      "janky_frames": 35,
+      "janky_percent": 2.001812163578537,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 20,
+      "timestamp": "2025-04-01 08:28:24",
+      "fps": 44.0,
+      "total_frames": 993,
+      "janky_frames": 37,
+      "janky_percent": 6.319684715644838,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 21,
+      "timestamp": "2025-04-01 08:28:26",
+      "fps": 44.0,
+      "total_frames": 1037,
+      "janky_frames": 39,
+      "janky_percent": 5.392378146181473,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 22,
+      "timestamp": "2025-04-01 08:28:28",
+      "fps": 46.0,
+      "total_frames": 1083,
+      "janky_frames": 42,
+      "janky_percent": 7.664584975092868,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 23,
+      "timestamp": "2025-04-01 08:28:31",
+      "fps": 50.0,
+      "total_frames": 1133,
+      "janky_frames": 44,
+      "janky_percent": 5.988858752881876,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 24,
+      "timestamp": "2025-04-01 08:28:33",
+      "fps": 49.0,
+      "total_frames": 1182,
+      "janky_frames": 47,
+      "janky_percent": 6.3997247144416205,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 25,
+      "timestamp": "2025-04-01 08:28:35",
+      "fps": 52.0,
+      "total_frames": 1234,
+      "janky_frames": 50,
+      "janky_percent": 5.894704869888555,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 26,
+      "timestamp": "2025-04-01 08:28:37",
+      "fps": 43.0,
+      "total_frames": 1277,
+      "janky_frames": 52,
+      "janky_percent": 6.797367426485708,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    },
+    {
+      "iteration": 27,
+      "timestamp": "2025-04-01 08:28:40",
+      "fps": 56.0,
+      "total_frames": 1333,
+      "janky_frames": 53,
+      "janky_percent": 2.3123027702641723,
+      "frame_time_distribution": {},
+      "detailed_frame_times": null
+    }
+  ],
+  "statistics": {
+    "min_fps": 43.0,
+    "max_fps": 58.0,
+    "avg_fps": 49.370370370370374,
+    "median_fps": 49.0,
+    "stdev_fps": 4.78095700226951,
+    "fps_stability": 0.8885971492873218,
+    "fps_stability_percent": 88.85971492873217
+  },
+  "summary": {
+    "total_frames": 1333,
+    "janky_frames": 53,
+    "janky_percent": 3.975993998499625
+  }
+}

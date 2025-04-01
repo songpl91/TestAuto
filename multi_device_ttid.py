@@ -19,6 +19,7 @@ import glob
 import time
 import re
 import json
+import platform
 from datetime import datetime
 from pathlib import Path
 import argparse
@@ -34,12 +35,23 @@ def get_latest_apk(directory):
 
 def run_adb_command(command, device_id=None):
     """执行adb命令并返回结果"""
+    # 检查系统类型，确保ADB命令能在不同平台正确执行
+    system_type = get_system_type()
+    
+    # 构建基本命令
     cmd = ['adb']
     if device_id:
         cmd.extend(['-s', device_id])
     
     if '|' in command:
-        full_cmd = ' '.join(cmd) + ' ' + command
+        # 对于包含管道的命令，需要使用shell=True
+        if system_type == 'windows':
+            # Windows下可能需要使用cmd /c
+            full_cmd = ' '.join(cmd) + ' ' + command
+        else:
+            # Mac和Linux可以直接使用管道
+            full_cmd = ' '.join(cmd) + ' ' + command
+            
         try:
             result = subprocess.run(full_cmd, shell=True, capture_output=True, text=True)
             return result.stdout.strip() if result.returncode == 0 else ""
@@ -47,6 +59,7 @@ def run_adb_command(command, device_id=None):
             print(f"执行命令失败: {full_cmd}\n错误信息: {str(e)}")
             return ""
     else:
+        # 对于不包含管道的简单命令
         cmd.extend(command.split())
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
@@ -102,11 +115,60 @@ def get_device_info(device_id):
         print(f"获取设备信息失败: {str(e)}")
         return None
 
+def get_system_type():
+    """获取当前系统类型"""
+    system = platform.system().lower()
+    if system == 'darwin':
+        return 'mac'
+    elif system == 'windows':
+        return 'windows'
+    elif system == 'linux':
+        return 'linux'
+    else:
+        return 'unknown'
+
 def get_package_name(apk_path):
     """从APK文件中提取package name"""
     try:
-        result = subprocess.run(['aapt', 'dump', 'badging', apk_path], 
-                              capture_output=True, text=True)
+        system_type = get_system_type()
+        
+        if system_type == 'mac':
+            # 在Mac上，aapt可能在Android SDK的build-tools目录下
+            # 尝试使用环境变量中的aapt或指定路径的aapt
+            try:
+                result = subprocess.run(['aapt', 'dump', 'badging', apk_path], 
+                                      capture_output=True, text=True)
+            except FileNotFoundError:
+                # 如果直接调用失败，尝试查找Android SDK路径
+                android_home = os.environ.get('ANDROID_HOME') or os.environ.get('ANDROID_SDK_ROOT')
+                if android_home:
+                    # 查找最新的build-tools版本
+                    build_tools_dir = os.path.join(android_home, 'build-tools')
+                    if os.path.exists(build_tools_dir):
+                        versions = os.listdir(build_tools_dir)
+                        if versions:
+                            latest_version = sorted(versions)[-1]
+                            aapt_path = os.path.join(build_tools_dir, latest_version, 'aapt')
+                            if os.path.exists(aapt_path):
+                                result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], 
+                                                      capture_output=True, text=True)
+                            else:
+                                print(f"错误：在 {aapt_path} 未找到aapt工具")
+                                return None
+                        else:
+                            print(f"错误：在 {build_tools_dir} 未找到build-tools版本")
+                            return None
+                    else:
+                        print(f"错误：未找到build-tools目录 {build_tools_dir}")
+                        return None
+                else:
+                    print("错误：未设置ANDROID_HOME或ANDROID_SDK_ROOT环境变量")
+                    return None
+        else:
+            # 其他系统直接尝试使用aapt
+            result = subprocess.run(['aapt', 'dump', 'badging', apk_path], 
+                                  capture_output=True, text=True)
+        
         if result.returncode != 0:
             print(f"错误：获取APK信息失败：{result.stderr}")
             return None
@@ -175,7 +237,7 @@ def collect_ttid(device_id, package_name, activity_name, repeat_count=5):
     
     return results
 
-def process_device(device_id, apk_path, package_name, activity_name, repeat_count):
+def process_device(device_id, apk_path, package_name, activity_name, repeat_count, results_dir=None):
     """处理单个设备的完整流程"""
     try:
         # 获取设备信息
@@ -216,7 +278,23 @@ def process_device(device_id, apk_path, package_name, activity_name, repeat_coun
         
         # 保存结果到JSON文件
         device_name = device_info['model']['full_name']
-        result_file = f"ttid_results_{device_name}_{device_id}.json"
+        
+        # 如果未指定结果目录，则根据系统类型确定默认路径
+        if not results_dir:
+            system_type = get_system_type()
+            if system_type == 'mac':
+                # 在Mac上使用当前目录或指定目录
+                results_dir = os.path.join(os.getcwd(), 'results')
+            elif system_type == 'windows':
+                # 在Windows上使用文档目录
+                results_dir = os.path.join(os.path.expanduser('~'), 'Documents', 'TestAutoResults')
+            else:  # Linux或其他系统
+                results_dir = os.path.join(os.path.expanduser('~'), 'TestAutoResults')
+        
+        # 确保结果目录存在
+        os.makedirs(results_dir, exist_ok=True)
+        
+        result_file = os.path.join(results_dir, f"ttid_results_{device_name}_{device_id}.json")
         with open(result_file, 'w', encoding='utf-8') as f:
             json.dump(result_data, f, ensure_ascii=False, indent=2)
         
@@ -226,11 +304,39 @@ def process_device(device_id, apk_path, package_name, activity_name, repeat_coun
         print(f"设备 {device_id} - 处理过程中发生错误：{str(e)}")
 
 def main():
+    # 检测当前系统类型
+    system_type = get_system_type()
+    print(f"当前运行平台: {system_type.upper()}")
+    
     parser = argparse.ArgumentParser(description='多设备TTID测量工具')
-    parser.add_argument('--apk-dir', default="D:\\UnityProjects\\HexaMatch", help='APK文件所在目录')
-    parser.add_argument('--activity', default='com.unity3d.player.UnityPlayerActivity', help='启动活动名称，默认为.MainActivity')
-    parser.add_argument('--repeat', type=int, default=5, help='每个设备重复测量次数，默认为5次')
+    
+    # 根据系统类型设置默认APK目录
+    if system_type == 'mac':
+        default_apk_dir = "/Volumes/MacEx/TestAutoAPK"
+    elif system_type == 'windows':
+        default_apk_dir = "D:\\UnityProjects\\HexaMatch"
+    else:  # Linux或其他系统
+        default_apk_dir = os.path.expanduser("~/TestAutoAPK")
+    
+    # 设置默认结果目录
+    if system_type == 'mac':
+        default_results_dir = os.path.join(os.getcwd(), 'results')
+    elif system_type == 'windows':
+        default_results_dir = os.path.join(os.path.expanduser('~'), 'Documents', 'TestAutoResults')
+    else:  # Linux或其他系统
+        default_results_dir = os.path.join(os.path.expanduser('~'), 'TestAutoResults')
+    
+    parser.add_argument('--apk-dir', default=default_apk_dir, help=f'APK文件所在目录 (默认: {default_apk_dir})')
+    parser.add_argument('--activity', default='com.unity3d.player.UnityPlayerActivity', help='启动活动名称，默认为UnityPlayerActivity')
+    parser.add_argument('--repeat', type=int, default=1, help='每个设备重复测量次数，默认为1次')
+    parser.add_argument('--results-dir', default=default_results_dir, help=f'结果文件保存目录 (默认: {default_results_dir})')
     args = parser.parse_args()
+    
+    print(f"APK目录: {args.apk_dir}")
+    print(f"结果保存目录: {args.results_dir}")
+    
+    # 确保结果目录存在
+    os.makedirs(args.results_dir, exist_ok=True)
     
     # 获取最新的APK文件
     apk_path = get_latest_apk(args.apk_dir)
@@ -262,7 +368,8 @@ def main():
                 apk_path,
                 package_name,
                 args.activity,
-                args.repeat
+                args.repeat,
+                args.results_dir
             )
             futures.append(future)
         
