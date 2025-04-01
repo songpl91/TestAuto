@@ -145,13 +145,28 @@ def collect_ttid(device_id, package_name, activity_name, repeat_count=5):
     for i in range(repeat_count):
         print(f"设备 {device_id} - 执行第 {i+1}/{repeat_count} 次TTID测量...")
         
+        # 清理后台进程和释放内存
+        print(f"设备 {device_id} - 清理后台进程和系统资源...")
+        run_adb_command("shell am kill-all", device_id)
+        run_adb_command("shell echo 3 > /proc/sys/vm/drop_caches", device_id)
+        
         # 强制停止应用
+        print(f"设备 {device_id} - 强制停止应用 {package_name}...")
         run_adb_command(f"shell am force-stop {package_name}", device_id)
-        time.sleep(1)
+        
+        # 对于小米设备，临时关闭MIUI优化
+        if 'xiaomi' in device_id.lower() or 'mi' in device_id.lower():
+            print(f"设备 {device_id} - 临时关闭MIUI优化...")
+            run_adb_command("shell settings put global miui_optimization 0", device_id)
+        
+        # 增加冷却时间
+        time.sleep(8)  # 增加到8秒的冷却时间
         
         # 启动应用并收集启动时间
         command = f"shell am start-activity -W -S -R 1 -n {component}"
+        print(f"设备 {device_id} - 执行命令: {command}")
         output = run_adb_command(command, device_id)
+        print(f"设备 {device_id} - 命令输出:\n{output}")
         
         if not output:
             print(f"设备 {device_id} - 警告：未能获取启动时间数据，跳过此次测量")
@@ -160,15 +175,27 @@ def collect_ttid(device_id, package_name, activity_name, repeat_count=5):
         # 解析输出结果
         this_time_match = re.search(r'ThisTime:\s+(\d+)', output)
         total_time_match = re.search(r'TotalTime:\s+(\d+)', output)
+        wait_time_match = re.search(r'WaitTime:\s+(\d+)', output)
         
         result = {
             "iteration": i + 1,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "this_time": int(this_time_match.group(1)) if this_time_match else None,
+            "total_time": int(total_time_match.group(1)) if total_time_match else None,
+            "wait_time": int(wait_time_match.group(1)) if wait_time_match else None,
+            "ttid_ms": None,
+            "time_type": None
         }
         
-        if this_time_match:
+        # 优先使用TotalTime作为TTID值
+        if total_time_match:
+            result["ttid_ms"] = int(total_time_match.group(1))
+            result["time_type"] = "TotalTime"
+            print(f"设备 {device_id} - TTID (TotalTime): {result['ttid_ms']} ms")
+        elif this_time_match:
             result["ttid_ms"] = int(this_time_match.group(1))
-            print(f"设备 {device_id} - TTID: {result['ttid_ms']} ms")
+            result["time_type"] = "ThisTime"
+            print(f"设备 {device_id} - TTID (ThisTime): {result['ttid_ms']} ms")
         
         results.append(result)
         time.sleep(2)
@@ -214,9 +241,14 @@ def process_device(device_id, apk_path, package_name, activity_name, repeat_coun
             "statistics": stats
         }
         
-        # 保存结果到JSON文件
+        # 创建结果目录
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         device_name = device_info['model']['full_name']
-        result_file = f"ttid_results_{device_name}_{device_id}.json"
+        result_dir = f"{device_name}_{device_id}_TTID_{timestamp}"
+        os.makedirs(result_dir, exist_ok=True)
+        
+        # 保存结果到JSON文件
+        result_file = os.path.join(result_dir, f"ttid_results_{device_name}_{device_id}_{timestamp}.json")
         with open(result_file, 'w', encoding='utf-8') as f:
             json.dump(result_data, f, ensure_ascii=False, indent=2)
         
@@ -229,7 +261,7 @@ def main():
     parser = argparse.ArgumentParser(description='多设备TTID测量工具')
     parser.add_argument('--apk-dir', default="D:\\UnityProjects\\HexaMatch", help='APK文件所在目录')
     parser.add_argument('--activity', default='com.unity3d.player.UnityPlayerActivity', help='启动活动名称，默认为.MainActivity')
-    parser.add_argument('--repeat', type=int, default=5, help='每个设备重复测量次数，默认为5次')
+    parser.add_argument('--repeat', type=int, default=5, help='每个设备重复测量次数，默认为1次')
     args = parser.parse_args()
     
     # 获取最新的APK文件
